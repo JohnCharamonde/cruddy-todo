@@ -35,7 +35,6 @@ const writeCounter = (count, callback) => {
       throw ('error writing counter');
     } else {
       callback(null, counterString);
-
     }
   });
 };
@@ -57,7 +56,7 @@ exports.getNextUniqueId = (callback) => {
 
 
   readCounter((err, id) => {
-    console.log('id', id);
+    // console.log('id', id);
     writeCounter(Number(id)+ 1, () => {
       callback(null, zeroPaddedNumber(Number(id) + 1));
     })

@@ -15,21 +15,48 @@ var items = {};
 // save file with todo item in this folder NOT OBJECT
 
 exports.create = (text, callback) => {
-  var id = counter.getNextUniqueId();
-  items[id] = text;
-  callback(null, { id, text });
+  counter.getNextUniqueId((err, id) => {
+    var filepath = path.join(exports.dataDir, `${id}.txt`);
+    fs.writeFile(filepath, text, (err) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, { id, text });
+      }
+    });
+  });
 };
-
 // [ ] Return an array of todos to client app whenever a
 // GET request to collection route occurs
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      callback(err);
+    } else {
+      var data = _.map(files, (file) => {
+        // The path.basename() methods returns the last portion of a path,
+        // Trailing directory separators are ignored, see path.sep.
+        var id = path.basename(file, '.txt'); // What does this line do?
+        return { id: id, text: id };
+      });
+      callback(null, data);
+    }
   });
-  callback(null, data);
 };
 
+// 1) find the current counter
+// 2) loop thorugh from currentcounter to 0
+// 3) tranform counter[i] into zeropadded number
+// 4) check if you can read it/that it exisits
+// 5) if so, push it to data as {id, text}
+// 6) map readFile for all elements in array
+
+
 exports.readOne = (id, callback) => {
+  // go though directory to create files array
+  //loop through files array to check if id === file id
+    //if so, readFile
+
   var text = items[id];
   if (!text) {
     callback(new Error(`No item with id: ${id}`));
